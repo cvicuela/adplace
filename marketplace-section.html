@@ -1,0 +1,1148 @@
+<!-- ============================================== -->
+<!-- MARKETPLACE BROWSING PAGE                      -->
+<!-- marketplace-section.html                       -->
+<!-- ============================================== -->
+<style>
+/* ==================== */
+/* MARKETPLACE LAYOUT   */
+/* ==================== */
+.mp-container {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* ==================== */
+/* FILTER SIDEBAR       */
+/* ==================== */
+.mp-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+.mp-sidebar::-webkit-scrollbar { width: 4px; }
+.mp-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.mp-sidebar-title {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mp-sidebar-title svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--text2);
+}
+
+.mp-filter-group {
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mp-filter-group:last-of-type {
+  border-bottom: none;
+  margin-bottom: 12px;
+  padding-bottom: 0;
+}
+
+.mp-filter-label {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+
+/* Search Input */
+.mp-search-input {
+  width: 100%;
+  padding: 10px 12px 10px 34px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.mp-search-input:focus {
+  border-color: var(--gold-light);
+}
+
+.mp-search-input::placeholder {
+  color: var(--text3);
+}
+
+.mp-search-wrap {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.mp-search-wrap::before {
+  content: "\1F50D";
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* Checkboxes */
+.mp-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.mp-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--text2);
+  transition: color 0.15s;
+}
+
+.mp-checkbox:hover { color: var(--text); }
+
+.mp-checkbox input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  background: var(--white);
+  transition: all 0.15s;
+}
+
+.mp-checkbox input[type="checkbox"]:checked {
+  background: var(--gold-light);
+  border-color: var(--gold-light);
+}
+
+.mp-checkbox input[type="checkbox"]:checked::after {
+  content: "\2713";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.mp-checkbox-count {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 500;
+}
+
+/* Select/Dropdown */
+.mp-select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%239CA3AF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.mp-select:focus { border-color: var(--gold-light); }
+
+/* Price Range */
+.mp-price-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.mp-price-input {
+  flex: 1;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  text-align: center;
+}
+
+.mp-price-input:focus { border-color: var(--gold-light); }
+
+.mp-price-sep {
+  font-size: 12px;
+  color: var(--text3);
+  flex-shrink: 0;
+}
+
+.mp-range-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 4px;
+  margin-top: 10px;
+  position: relative;
+}
+
+.mp-range-fill {
+  position: absolute;
+  left: 10%;
+  right: 30%;
+  top: 0;
+  bottom: 0;
+  background: var(--gold-light);
+  border-radius: 4px;
+}
+
+.mp-range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'Hanken Grotesk', sans-serif;
+}
+
+/* Pills */
+.mp-pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mp-pill {
+  padding: 5px 11px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 11px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.mp-pill:hover {
+  border-color: var(--gold-light);
+  color: var(--text);
+}
+
+.mp-pill.active {
+  background: var(--gold-bg);
+  border-color: var(--gold-light);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* Radio-style options */
+.mp-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mp-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.mp-radio:hover { color: var(--text); }
+
+.mp-radio input[type="radio"] {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  background: var(--white);
+  transition: all 0.15s;
+}
+
+.mp-radio input[type="radio"]:checked {
+  border-color: var(--gold-light);
+}
+
+.mp-radio input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-light);
+}
+
+/* Results counter in sidebar */
+.mp-results-count {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  padding: 12px 0 4px;
+}
+
+.mp-results-count span {
+  color: var(--gold);
+}
+
+/* Clear Filters */
+.mp-clear-btn {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--white);
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.mp-clear-btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: var(--red-bg);
+}
+
+/* ==================== */
+/* RESULTS PANEL        */
+/* ==================== */
+.mp-results {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Sort Bar */
+.mp-sort-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  box-shadow: var(--shadow);
+}
+
+.mp-sort-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mp-sort-left .mp-showing {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.mp-sort-left .mp-showing strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.mp-sort-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mp-sort-select {
+  padding: 7px 30px 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 11px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%239CA3AF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.mp-view-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mp-view-btn {
+  padding: 7px 10px;
+  background: var(--white);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  color: var(--text3);
+}
+
+.mp-view-btn:first-child { border-right: 1px solid var(--border); }
+
+.mp-view-btn.active {
+  background: var(--navy);
+  color: var(--white);
+}
+
+.mp-view-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ==================== */
+/* MEDIA CARDS GRID     */
+/* ==================== */
+.mp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+/* Enhanced listing card for marketplace */
+.mp-card.listing-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.mp-card .listing-card-img {
+  position: relative;
+  height: 140px;
+}
+
+.mp-card .listing-card-badge {
+  top: 10px;
+  left: 10px;
+}
+
+.mp-verified-badge {
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  background: var(--green);
+  color: white;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.mp-verified-badge::before {
+  content: "\2713";
+  font-size: 8px;
+}
+
+.mp-fav-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(4px);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s;
+  color: var(--text3);
+  line-height: 1;
+}
+
+.mp-fav-btn:hover {
+  background: var(--red-bg);
+  color: var(--red);
+  transform: scale(1.1);
+}
+
+.mp-fav-btn.active {
+  color: var(--red);
+}
+
+/* Card body extended */
+.mp-card .listing-card-body {
+  padding: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.mp-card-reach {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mp-card-reach::before {
+  content: "\1F4E1";
+  font-size: 10px;
+}
+
+.mp-card-supplier {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.mp-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+.mp-card-footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mp-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mp-availability.available {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.mp-availability.booked {
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.mp-availability.coming-soon {
+  background: var(--blue-bg);
+  color: var(--blue);
+}
+
+.mp-availability-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.mp-book-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--navy);
+  color: var(--white);
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.mp-book-btn:hover {
+  background: var(--gold-light);
+  color: var(--navy);
+}
+
+.mp-book-btn.disabled {
+  background: var(--bg2);
+  color: var(--text3);
+  cursor: not-allowed;
+}
+
+.mp-book-btn.disabled:hover {
+  background: var(--bg2);
+  color: var(--text3);
+}
+
+/* ==================== */
+/* PAGINATION           */
+/* ==================== */
+.mp-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 28px;
+  padding: 16px 0;
+}
+
+.mp-page-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.mp-page-btn:hover {
+  border-color: var(--gold-light);
+  color: var(--text);
+}
+
+.mp-page-btn.active {
+  background: var(--navy);
+  color: var(--white);
+  border-color: var(--navy);
+}
+
+.mp-page-btn.nav {
+  width: auto;
+  padding: 0 14px;
+  font-size: 11px;
+  gap: 4px;
+}
+
+.mp-page-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.mp-page-dots {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 2px;
+}
+</style>
+
+<div class="mp-container">
+  <!-- ============================== -->
+  <!-- FILTER SIDEBAR                 -->
+  <!-- ============================== -->
+  <aside class="mp-sidebar">
+    <div class="mp-sidebar-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="16" y2="12"/><line x1="4" y1="18" x2="12" y2="18"/></svg>
+      Filtros
+    </div>
+
+    <!-- Search -->
+    <div class="mp-search-wrap">
+      <input type="text" class="mp-search-input" placeholder="Buscar espacios, medios...">
+    </div>
+
+    <!-- Media Type -->
+    <div class="mp-filter-group">
+      <div class="mp-filter-label">Tipo de Medio</div>
+      <div class="mp-checkbox-list">
+        <label class="mp-checkbox">
+          <input type="checkbox"> Billboards / Vallas
+          <span class="mp-checkbox-count">214</span>
+        </label>
+        <label class="mp-checkbox">
+          <input type="checkbox" checked> LED / DOOH
+          <span class="mp-checkbox-count">89</span>
+        </label>
+        <label class="mp-checkbox">
+          <input type="checkbox"> Revistas
+          <span class="mp-checkbox-count">47</span>
+        </label>
+        <label class="mp-checkbox">
+          <input type="checkbox"> Periodicos
+          <span class="mp-checkbox-count">32</span>
+        </label>
+        <label class="mp-checkbox">
+          <input type="checkbox"> Radio
+          <span class="mp-checkbox-count">156</span>
+        </label>
+        <label class="mp-checkbox">
+          <input type="checkbox"> Podcasts
+          <span class="mp-checkbox-count">78</span>
+        </label>
+        <label class="mp-checkbox">
+          <input type="checkbox"> Websites
+          <span class="mp-checkbox-count">203</span>
+        </label>
+        <label class="mp-checkbox">
+          <input type="checkbox"> Newsletters
+          <span class="mp-checkbox-count">64</span>
+        </label>
+        <label class="mp-checkbox">
+          <input type="checkbox" checked> Influencers
+          <span class="mp-checkbox-count">312</span>
+        </label>
+        <label class="mp-checkbox">
+          <input type="checkbox"> Eventos
+          <span class="mp-checkbox-count">28</span>
+        </label>
+        <label class="mp-checkbox">
+          <input type="checkbox"> QR Placements
+          <span class="mp-checkbox-count">37</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="mp-filter-group">
+      <div class="mp-filter-label">Ubicacion</div>
+      <select class="mp-select">
+        <option value="">Todas las ubicaciones</option>
+        <option value="santo-domingo" selected>Santo Domingo</option>
+        <option value="santiago">Santiago</option>
+        <option value="nacional">Nacional</option>
+        <option value="digital">Digital</option>
+      </select>
+    </div>
+
+    <!-- Price Range -->
+    <div class="mp-filter-group">
+      <div class="mp-filter-label">Rango de Precio</div>
+      <div class="mp-price-row">
+        <input type="text" class="mp-price-input" placeholder="$500" value="$500">
+        <span class="mp-price-sep">&mdash;</span>
+        <input type="text" class="mp-price-input" placeholder="$10,000" value="$7,000">
+      </div>
+      <div class="mp-range-bar">
+        <div class="mp-range-fill"></div>
+      </div>
+      <div class="mp-range-labels">
+        <span>$0</span>
+        <span>$15,000+</span>
+      </div>
+    </div>
+
+    <!-- Audience -->
+    <div class="mp-filter-group">
+      <div class="mp-filter-label">Audiencia</div>
+      <div class="mp-pill-grid">
+        <span class="mp-pill active">Ejecutivos</span>
+        <span class="mp-pill">Millennials</span>
+        <span class="mp-pill">Familias</span>
+        <span class="mp-pill">Estudiantes</span>
+        <span class="mp-pill">General</span>
+      </div>
+    </div>
+
+    <!-- Industry -->
+    <div class="mp-filter-group">
+      <div class="mp-filter-label">Industria</div>
+      <div class="mp-pill-grid">
+        <span class="mp-pill active">Real Estate</span>
+        <span class="mp-pill">Retail</span>
+        <span class="mp-pill">Banca</span>
+        <span class="mp-pill">Auto</span>
+        <span class="mp-pill">Tech</span>
+        <span class="mp-pill">Food</span>
+      </div>
+    </div>
+
+    <!-- Reach -->
+    <div class="mp-filter-group">
+      <div class="mp-filter-label">Alcance Minimo</div>
+      <select class="mp-select">
+        <option value="">Sin minimo</option>
+        <option value="10000">10,000+</option>
+        <option value="50000" selected>50,000+</option>
+        <option value="100000">100,000+</option>
+        <option value="500000">500,000+</option>
+      </select>
+    </div>
+
+    <!-- Availability -->
+    <div class="mp-filter-group">
+      <div class="mp-filter-label">Disponibilidad</div>
+      <div class="mp-radio-group">
+        <label class="mp-radio">
+          <input type="radio" name="availability" checked> Disponible Ahora
+        </label>
+        <label class="mp-radio">
+          <input type="radio" name="availability"> Proximos 30 Dias
+        </label>
+        <label class="mp-radio">
+          <input type="radio" name="availability"> Todos
+        </label>
+      </div>
+    </div>
+
+    <!-- Clear Filters -->
+    <button class="mp-clear-btn">Limpiar Filtros</button>
+
+    <!-- Results counter -->
+    <div class="mp-results-count"><span>1,260</span> resultados encontrados</div>
+  </aside>
+
+  <!-- ============================== -->
+  <!-- RESULTS PANEL                  -->
+  <!-- ============================== -->
+  <div class="mp-results">
+    <!-- Sort Bar -->
+    <div class="mp-sort-bar">
+      <div class="mp-sort-left">
+        <span class="mp-showing">Mostrando <strong>1&ndash;12</strong> de <strong>1,260</strong> espacios</span>
+      </div>
+      <div class="mp-sort-right">
+        <select class="mp-sort-select">
+          <option>Precio: Menor a Mayor</option>
+          <option>Precio: Mayor a Menor</option>
+          <option>Alcance</option>
+          <option>Calificacion</option>
+          <option>Mas Recientes</option>
+        </select>
+        <div class="mp-view-toggle">
+          <button class="mp-view-btn active" title="Vista de cuadricula">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          </button>
+          <button class="mp-view-btn" title="Vista de lista">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="mp-grid">
+
+      <!-- Card 1: Billboard Piantini #204 -->
+      <div class="listing-card mp-card" onclick="showPage('listing-detalle')">
+        <div class="listing-card-img bg-green">
+          🗺️
+          <div class="listing-card-badge">OOH</div>
+          <span class="mp-verified-badge">Verificado</span>
+          <button class="mp-fav-btn" onclick="event.stopPropagation()">&#9825;</button>
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-type">Valla Exterior</div>
+          <div class="listing-card-name">Billboard Piantini #204</div>
+          <div class="listing-card-loc">📍 Santo Domingo, Piantini</div>
+          <div class="mp-card-reach">95k vehiculos/dia</div>
+          <div class="listing-card-stats">
+            <div class="listing-card-price">$4,500 <span>/mes</span></div>
+            <div class="listing-card-audience">14x48 ft</div>
+          </div>
+          <div class="mp-card-supplier">por Media Outdoor RD</div>
+          <div class="mp-card-footer">
+            <div class="mp-card-footer-left">
+              <div class="mp-availability available"><span class="mp-availability-dot"></span> Disponible</div>
+            </div>
+            <button class="mp-book-btn">Reservar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Acropolis Mall Screen -->
+      <div class="listing-card mp-card" onclick="showPage('listing-detalle')">
+        <div class="listing-card-img bg-blue">
+          📺
+          <div class="listing-card-badge">DOOH</div>
+          <span class="mp-verified-badge">Verificado</span>
+          <button class="mp-fav-btn" onclick="event.stopPropagation()">&#9825;</button>
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-type">Pantalla Digital</div>
+          <div class="listing-card-name">Pantalla Acropolis Mall</div>
+          <div class="listing-card-loc">📍 Santo Domingo, Centro</div>
+          <div class="mp-card-reach">200k impresiones/dia</div>
+          <div class="listing-card-stats">
+            <div class="listing-card-price">$2,800 <span>/mes</span></div>
+            <div class="listing-card-audience">Full HD LED</div>
+          </div>
+          <div class="mp-card-supplier">por ScreenMedia DR</div>
+          <div class="mp-card-footer">
+            <div class="mp-card-footer-left">
+              <div class="mp-availability available"><span class="mp-availability-dot"></span> Disponible</div>
+            </div>
+            <button class="mp-book-btn">Reservar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: @arquitectura.do -->
+      <div class="listing-card mp-card" onclick="showPage('listing-detalle')">
+        <div class="listing-card-img bg-purple">
+          📲
+          <div class="listing-card-badge">Influencer</div>
+          <button class="mp-fav-btn active" onclick="event.stopPropagation()">&#9829;</button>
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-type">Influencer</div>
+          <div class="listing-card-name">@arquitectura.do</div>
+          <div class="listing-card-loc">📍 Instagram &middot; Nacional</div>
+          <div class="mp-card-reach">220k seguidores</div>
+          <div class="listing-card-stats">
+            <div class="listing-card-price">$2,000 <span>/post</span></div>
+            <div class="listing-card-audience">4.2% eng.</div>
+          </div>
+          <div class="mp-card-supplier">por Talent Hub RD</div>
+          <div class="mp-card-footer">
+            <div class="mp-card-footer-left">
+              <div class="mp-availability available"><span class="mp-availability-dot"></span> Disponible</div>
+            </div>
+            <button class="mp-book-btn">Reservar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Negocios RD Weekly (Podcast) -->
+      <div class="listing-card mp-card" onclick="showPage('listing-detalle')">
+        <div class="listing-card-img bg-teal">
+          🎙️
+          <div class="listing-card-badge">Podcast</div>
+          <button class="mp-fav-btn" onclick="event.stopPropagation()">&#9825;</button>
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-type">Podcast</div>
+          <div class="listing-card-name">Negocios RD Weekly</div>
+          <div class="listing-card-loc">📍 Digital &middot; Semanal</div>
+          <div class="mp-card-reach">48k oyentes</div>
+          <div class="listing-card-stats">
+            <div class="listing-card-price">$900 <span>/episodio</span></div>
+            <div class="listing-card-audience">Spotify + Apple</div>
+          </div>
+          <div class="mp-card-supplier">por PodcastLatam</div>
+          <div class="mp-card-footer">
+            <div class="mp-card-footer-left">
+              <div class="mp-availability available"><span class="mp-availability-dot"></span> Disponible</div>
+            </div>
+            <button class="mp-book-btn">Reservar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: Revista Inmobiliaria RD -->
+      <div class="listing-card mp-card" onclick="showPage('listing-detalle')">
+        <div class="listing-card-img bg-amber">
+          📰
+          <div class="listing-card-badge">Print</div>
+          <span class="mp-verified-badge">Verificado</span>
+          <button class="mp-fav-btn" onclick="event.stopPropagation()">&#9825;</button>
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-type">Revista</div>
+          <div class="listing-card-name">Revista Inmobiliaria RD</div>
+          <div class="listing-card-loc">📍 Nacional &middot; Mensual</div>
+          <div class="mp-card-reach">85k lectores</div>
+          <div class="listing-card-stats">
+            <div class="listing-card-price">$1,200 <span>/edicion</span></div>
+            <div class="listing-card-audience">Full page</div>
+          </div>
+          <div class="mp-card-supplier">por Editorial Inmobilia</div>
+          <div class="mp-card-footer">
+            <div class="mp-card-footer-left">
+              <div class="mp-availability coming-soon"><span class="mp-availability-dot"></span> Prox. Edicion</div>
+            </div>
+            <button class="mp-book-btn">Reservar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6: Z101 Prime Time -->
+      <div class="listing-card mp-card" onclick="showPage('listing-detalle')">
+        <div class="listing-card-img bg-rose">
+          📻
+          <div class="listing-card-badge">Radio</div>
+          <span class="mp-verified-badge">Verificado</span>
+          <button class="mp-fav-btn" onclick="event.stopPropagation()">&#9825;</button>
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-type">Radio</div>
+          <div class="listing-card-name">Z101 Prime Time</div>
+          <div class="listing-card-loc">📍 Nacional &middot; 8-9am</div>
+          <div class="mp-card-reach">320k oyentes</div>
+          <div class="listing-card-stats">
+            <div class="listing-card-price">$3,400 <span>/semana</span></div>
+            <div class="listing-card-audience">30s spot</div>
+          </div>
+          <div class="mp-card-supplier">por Grupo Z</div>
+          <div class="mp-card-footer">
+            <div class="mp-card-footer-left">
+              <div class="mp-availability booked"><span class="mp-availability-dot"></span> Reservado</div>
+            </div>
+            <button class="mp-book-btn disabled">No Disponible</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7: Inversiones RD Weekly (Newsletter) -->
+      <div class="listing-card mp-card" onclick="showPage('listing-detalle')">
+        <div class="listing-card-img" style="background: linear-gradient(135deg, #FFD6E0, #FFEBF0);">
+          📧
+          <div class="listing-card-badge">Newsletter</div>
+          <button class="mp-fav-btn" onclick="event.stopPropagation()">&#9825;</button>
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-type">Newsletter</div>
+          <div class="listing-card-name">Inversiones RD Weekly</div>
+          <div class="listing-card-loc">📍 Email &middot; Semanal</div>
+          <div class="mp-card-reach">28k suscriptores</div>
+          <div class="listing-card-stats">
+            <div class="listing-card-price">$600 <span>/envio</span></div>
+            <div class="listing-card-audience">42% open rate</div>
+          </div>
+          <div class="mp-card-supplier">por NewslettersDR</div>
+          <div class="mp-card-footer">
+            <div class="mp-card-footer-left">
+              <div class="mp-availability available"><span class="mp-availability-dot"></span> Disponible</div>
+            </div>
+            <button class="mp-book-btn">Reservar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8: Panel SDQ Las Americas (Airport) -->
+      <div class="listing-card mp-card" onclick="showPage('listing-detalle')">
+        <div class="listing-card-img bg-rose">
+          ✈️
+          <div class="listing-card-badge">Aeropuerto</div>
+          <span class="mp-verified-badge">Verificado</span>
+          <button class="mp-fav-btn" onclick="event.stopPropagation()">&#9825;</button>
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-type">Aeropuerto</div>
+          <div class="listing-card-name">Panel SDQ Las Americas</div>
+          <div class="listing-card-loc">📍 Aeropuerto SDQ &middot; Terminal 1</div>
+          <div class="mp-card-reach">180k pasajeros/mes</div>
+          <div class="listing-card-stats">
+            <div class="listing-card-price">$6,000 <span>/mes</span></div>
+            <div class="listing-card-audience">Backlit 3x2m</div>
+          </div>
+          <div class="mp-card-supplier">por AeroMedia Group</div>
+          <div class="mp-card-footer">
+            <div class="mp-card-footer-left">
+              <div class="mp-availability coming-soon"><span class="mp-availability-dot"></span> Prox. 30 Dias</div>
+            </div>
+            <button class="mp-book-btn">Reservar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 9: Supermercados Nacional (Retail Media) -->
+      <div class="listing-card mp-card" onclick="showPage('listing-detalle')">
+        <div class="listing-card-img bg-green">
+          🏪
+          <div class="listing-card-badge">Retail</div>
+          <span class="mp-verified-badge">Verificado</span>
+          <button class="mp-fav-btn" onclick="event.stopPropagation()">&#9825;</button>
+        </div>
+        <div class="listing-card-body">
+          <div class="listing-card-type">Retail Media</div>
+          <div class="listing-card-name">Supermercados Nacional</div>
+          <div class="listing-card-loc">📍 20 sucursales &middot; Nacional</div>
+          <div class="mp-card-reach">1.2M visitas/mes</div>
+          <div class="listing-card-stats">
+            <div class="listing-card-price">$2,400 <span>/mes</span></div>
+            <div class="listing-card-audience">In-store display</div>
+          </div>
+          <div class="mp-card-supplier">por Nacional Media</div>
+          <div class="mp-card-footer">
+            <div class="mp-card-footer-left">
+              <div class="mp-availability available"><span class="mp-availability-dot"></span> Disponible</div>
+            </div>
+            <button class="mp-book-btn">Reservar</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.mp-grid -->
+
+    <!-- Pagination -->
+    <div class="mp-pagination">
+      <button class="mp-page-btn nav disabled">&larr; Anterior</button>
+      <button class="mp-page-btn active">1</button>
+      <button class="mp-page-btn">2</button>
+      <button class="mp-page-btn">3</button>
+      <button class="mp-page-btn">4</button>
+      <button class="mp-page-btn">5</button>
+      <span class="mp-page-dots">&hellip;</span>
+      <button class="mp-page-btn">105</button>
+      <button class="mp-page-btn nav">Siguiente &rarr;</button>
+    </div>
+
+  </div><!-- /.mp-results -->
+</div><!-- /.mp-container -->
