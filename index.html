@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AdPlace — The Global Marketplace for Advertising Space</title>
 <meta name="description" content="AdPlace connects advertisers, media suppliers, and agencies. Browse 1,260+ advertising spaces across billboards, digital screens, print, radio, podcasts, and more.">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ============ APP DESIGN SYSTEM ============ */
 /* ==========================================================================
@@ -4232,6 +4232,579 @@ a:focus-visible {
 #view-app { display: none; }
 body.app-mode #view-landing { display: none; }
 body.app-mode #view-app { display: block; }
+
+/* ==========================================================================
+   AD EDITOR MODAL — Professional DOOH Creative Editor
+   ========================================================================== */
+.ae-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+  display: none; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; transition: opacity 0.3s ease;
+}
+.ae-overlay.open { display: flex; opacity: 1; }
+.ae-overlay.opening { display: flex; }
+
+.ae-modal {
+  width: 100%; max-width: 1280px; max-height: 92vh;
+  background: #fff; border-radius: 20px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05);
+  display: flex; flex-direction: column; overflow: hidden;
+  transform: translateY(20px) scale(0.97); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+.ae-overlay.open .ae-modal { transform: translateY(0) scale(1); }
+
+/* ---- Header ---- */
+.ae-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 24px; border-bottom: 1px solid #E2E8F0;
+  background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+  flex-shrink: 0;
+}
+.ae-header-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  background: linear-gradient(135deg, #3B82F6, #2563EB); color: #fff;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.ae-header-badge svg { width: 14px; height: 14px; }
+.ae-header-supplier { font-size: 13px; color: #64748B; font-weight: 500; }
+.ae-header-title {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 18px; font-weight: 800; color: #0F172A;
+  margin-left: 4px;
+}
+.ae-header-close {
+  margin-left: auto; width: 36px; height: 36px; border-radius: 10px;
+  border: 1px solid #E2E8F0; background: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; color: #64748B;
+}
+.ae-header-close:hover { background: #FEE2E2; border-color: #FECACA; color: #EF4444; }
+
+/* ---- Body: Two-column layout ---- */
+.ae-body {
+  display: grid; grid-template-columns: 1fr 400px;
+  flex: 1; overflow: hidden;
+}
+
+/* ---- Left Column: Preview ---- */
+.ae-preview-col {
+  padding: 24px; overflow-y: auto;
+  background: #F1F5F9;
+}
+.ae-preview-label {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; color: #94A3B8; margin-bottom: 14px;
+}
+
+/* Billboard environment frame */
+.ae-environment {
+  position: relative; border-radius: 16px; overflow: hidden;
+  background: linear-gradient(180deg, #CBD5E1 0%, #94A3B8 40%, #64748B 100%);
+  aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.ae-env-city {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 55%;
+  background:
+    linear-gradient(0deg, #475569 0%, transparent 100%),
+    repeating-linear-gradient(90deg, transparent 0px, transparent 18px, rgba(255,255,255,0.06) 18px, rgba(255,255,255,0.06) 20px),
+    repeating-linear-gradient(0deg, transparent 0px, transparent 30px, rgba(255,255,255,0.04) 30px, rgba(255,255,255,0.04) 32px);
+}
+.ae-env-buildings {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 40%;
+  display: flex; align-items: flex-end; justify-content: center; gap: 4px; padding: 0 20px;
+}
+.ae-env-building {
+  background: linear-gradient(180deg, #334155, #1E293B);
+  border-radius: 3px 3px 0 0; flex-shrink: 0; position: relative; overflow: hidden;
+}
+.ae-env-building::before {
+  content: ''; position: absolute; inset: 4px;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 6px,
+    rgba(253,230,138,0.15) 6px, rgba(253,230,138,0.15) 8px
+  );
+  background-size: 10px 8px;
+}
+
+/* The billboard structure */
+.ae-billboard-frame {
+  position: relative; z-index: 2; width: 72%; aspect-ratio: 3/2;
+  display: flex; flex-direction: column; align-items: center;
+}
+.ae-billboard-screen {
+  width: 100%; flex: 1; border-radius: 6px; overflow: hidden;
+  background: #0F172A; position: relative;
+  box-shadow:
+    0 0 40px rgba(59,130,246,0.15),
+    0 0 80px rgba(59,130,246,0.08),
+    inset 0 0 30px rgba(0,0,0,0.3),
+    0 2px 0 #475569;
+  border: 3px solid #475569;
+}
+/* LED glow effect */
+.ae-billboard-screen::before {
+  content: ''; position: absolute; inset: -6px; z-index: -1;
+  border-radius: 10px;
+  background: radial-gradient(ellipse at center, rgba(59,130,246,0.12) 0%, transparent 70%);
+  filter: blur(8px);
+}
+/* Screen reflection overlay */
+.ae-billboard-screen::after {
+  content: ''; position: absolute; inset: 0; z-index: 10; pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.08) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255,255,255,0.03) 100%
+  );
+}
+
+/* Creative content inside screen */
+.ae-creative-content {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 20px;
+  transition: all 0.3s ease; overflow: hidden;
+}
+.ae-creative-bg-overlay {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center;
+  filter: blur(20px) brightness(0.4); transform: scale(1.2);
+}
+.ae-creative-inner {
+  position: relative; z-index: 1; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  width: 100%;
+}
+.ae-creative-uploaded-img {
+  max-width: 100%; max-height: 100%; object-fit: contain;
+  position: relative; z-index: 1;
+}
+.ae-creative-title {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 22px; font-weight: 800; line-height: 1.1;
+}
+.ae-creative-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 500; opacity: 0.85;
+}
+.ae-creative-cta-btn {
+  margin-top: 6px; padding: 7px 22px; border-radius: 20px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 12px; font-weight: 700; border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.15); backdrop-filter: blur(4px);
+  cursor: default; transition: all 0.2s;
+}
+
+/* Billboard support pole */
+.ae-billboard-pole {
+  width: 12px; height: 50px;
+  background: linear-gradient(90deg, #475569, #64748B, #475569);
+  border-radius: 0 0 3px 3px;
+}
+
+/* Fit mode controls */
+.ae-fit-controls {
+  display: flex; align-items: center; gap: 8px; margin-top: 16px;
+}
+.ae-fit-label {
+  font-size: 11px; font-weight: 600; color: #64748B;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.ae-fit-toggle {
+  display: flex; background: #E2E8F0; border-radius: 8px; overflow: hidden;
+}
+.ae-fit-btn {
+  padding: 6px 14px; font-size: 11px; font-weight: 600;
+  border: none; background: transparent; color: #64748B;
+  cursor: pointer; transition: all 0.2s;
+}
+.ae-fit-btn.active {
+  background: #0F172A; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Upload drop zone */
+.ae-upload-zone {
+  margin-top: 16px; border: 2px dashed #CBD5E1; border-radius: 14px;
+  padding: 20px; text-align: center; cursor: pointer;
+  transition: all 0.25s; background: rgba(255,255,255,0.7);
+}
+.ae-upload-zone:hover, .ae-upload-zone.dragover {
+  border-color: #3B82F6; background: #EFF6FF;
+}
+.ae-upload-zone.dragover { transform: scale(1.01); }
+.ae-upload-icon {
+  width: 48px; height: 48px; margin: 0 auto 10px;
+  background: linear-gradient(135deg, #DBEAFE, #BFDBFE); border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.ae-upload-icon svg { width: 24px; height: 24px; color: #3B82F6; }
+.ae-upload-title {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 14px; font-weight: 700; color: #0F172A; margin-bottom: 4px;
+}
+.ae-upload-sub { font-size: 12px; color: #94A3B8; }
+.ae-upload-sub span { color: #3B82F6; font-weight: 600; text-decoration: underline; }
+.ae-upload-formats {
+  display: flex; gap: 6px; justify-content: center; margin-top: 10px;
+}
+.ae-upload-fmt {
+  padding: 3px 10px; border-radius: 6px; font-size: 10px;
+  font-weight: 700; background: #F1F5F9; color: #64748B;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.ae-upload-file { display: none; }
+
+/* Uploaded image info bar */
+.ae-upload-info {
+  margin-top: 12px; display: none; align-items: center; gap: 10px;
+  padding: 10px 14px; background: #ECFDF5; border-radius: 10px;
+  border: 1px solid #A7F3D0;
+}
+.ae-upload-info.visible { display: flex; }
+.ae-upload-info-icon { color: #10B981; flex-shrink: 0; }
+.ae-upload-info-text { font-size: 12px; color: #065F46; flex: 1; }
+.ae-upload-info-name { font-weight: 600; }
+.ae-upload-info-size { color: #6EE7B7; }
+.ae-upload-remove {
+  width: 24px; height: 24px; border-radius: 6px; border: none;
+  background: #FEE2E2; color: #EF4444; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; transition: all 0.2s;
+}
+.ae-upload-remove:hover { background: #FECACA; }
+
+/* Media spec card */
+.ae-specs {
+  margin-top: 20px; display: grid;
+  grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+.ae-spec-card {
+  background: #fff; border-radius: 12px; padding: 14px;
+  border: 1px solid #E2E8F0; transition: all 0.2s;
+}
+.ae-spec-card:hover { border-color: #CBD5E1; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.ae-spec-icon {
+  width: 32px; height: 32px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; margin-bottom: 8px;
+}
+.ae-spec-icon.loc { background: #FEE2E2; }
+.ae-spec-icon.size { background: #DBEAFE; }
+.ae-spec-icon.imp { background: #D1FAE5; }
+.ae-spec-icon.fmt { background: #E0E7FF; }
+.ae-spec-icon.rating { background: #FEF3C7; }
+.ae-spec-icon.ar { background: #F3E8FF; }
+.ae-spec-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: #94A3B8; margin-bottom: 2px;
+}
+.ae-spec-value {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 14px; font-weight: 700; color: #0F172A;
+}
+
+/* Dimension diagram */
+.ae-dim-diagram {
+  margin-top: 16px; background: #fff; border-radius: 14px;
+  padding: 16px; border: 1px solid #E2E8F0;
+  display: flex; align-items: center; gap: 20px;
+}
+.ae-dim-visual {
+  width: 100px; height: 66px; border: 2px solid #3B82F6;
+  border-radius: 6px; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+}
+.ae-dim-w {
+  position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; font-weight: 700; color: #3B82F6;
+  background: #fff; padding: 1px 6px; border-radius: 4px;
+  border: 1px solid #BFDBFE; white-space: nowrap;
+}
+.ae-dim-h {
+  position: absolute; right: -26px; top: 50%; transform: translateY(-50%);
+  font-size: 10px; font-weight: 700; color: #3B82F6;
+  background: #fff; padding: 1px 6px; border-radius: 4px;
+  border: 1px solid #BFDBFE; white-space: nowrap;
+}
+.ae-dim-info { flex: 1; }
+.ae-dim-info-row {
+  display: flex; justify-content: space-between;
+  font-size: 12px; padding: 4px 0; color: #475569;
+}
+.ae-dim-info-row span:first-child { color: #94A3B8; font-weight: 500; }
+.ae-dim-info-row span:last-child { font-weight: 700; color: #0F172A; }
+
+/* ---- Right Column: Editor Controls ---- */
+.ae-editor-col {
+  padding: 24px; overflow-y: auto;
+  border-left: 1px solid #E2E8F0;
+  background: #fff;
+}
+.ae-editor-section {
+  margin-bottom: 20px;
+}
+.ae-editor-section-title {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; color: #94A3B8; margin-bottom: 12px;
+}
+
+/* Text fields */
+.ae-field { margin-bottom: 14px; }
+.ae-field-label {
+  font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 5px;
+  display: block;
+}
+.ae-field-input {
+  width: 100%; padding: 10px 14px; border: 1.5px solid #E2E8F0;
+  border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif;
+  color: #0F172A; background: #F8FAFC;
+  transition: all 0.2s; outline: none; box-sizing: border-box;
+}
+.ae-field-input:focus {
+  border-color: #3B82F6; background: #fff;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+}
+textarea.ae-field-input { resize: vertical; min-height: 60px; }
+
+/* Typography controls */
+.ae-typo-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-bottom: 10px;
+}
+.ae-typo-select {
+  width: 100%; padding: 8px 10px; border: 1.5px solid #E2E8F0;
+  border-radius: 8px; font-size: 12px; font-family: 'Inter', sans-serif;
+  color: #0F172A; background: #F8FAFC; cursor: pointer;
+  outline: none; transition: all 0.2s; box-sizing: border-box;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 28px;
+}
+.ae-typo-select:focus { border-color: #3B82F6; background: #fff; }
+.ae-typo-mini {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+}
+.ae-typo-mini-field { display: flex; flex-direction: column; gap: 3px; }
+.ae-typo-mini-label {
+  font-size: 9px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px; color: #94A3B8;
+}
+.ae-typo-mini-input {
+  width: 100%; padding: 6px 8px; border: 1.5px solid #E2E8F0;
+  border-radius: 6px; font-size: 11px; text-align: center;
+  font-family: 'Inter', sans-serif; color: #0F172A; background: #F8FAFC;
+  outline: none; transition: all 0.2s; box-sizing: border-box;
+}
+.ae-typo-mini-input:focus { border-color: #3B82F6; }
+
+/* Color pickers */
+.ae-colors { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.ae-color-swatch {
+  width: 34px; height: 34px; border-radius: 10px; cursor: pointer;
+  border: 2.5px solid transparent; transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.ae-color-swatch:hover { transform: scale(1.1); }
+.ae-color-swatch.active { border-color: #0F172A; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0F172A; }
+
+.ae-text-colors { display: flex; gap: 8px; margin-top: 8px; }
+.ae-text-color-btn {
+  display: flex; align-items: center; gap: 6px; padding: 7px 16px;
+  border-radius: 8px; border: 1.5px solid #E2E8F0; cursor: pointer;
+  font-size: 12px; font-weight: 600; transition: all 0.2s;
+  background: #fff;
+}
+.ae-text-color-btn:hover { border-color: #CBD5E1; }
+.ae-text-color-btn.active { border-color: #0F172A; background: #F8FAFC; }
+.ae-text-color-btn .dot {
+  width: 14px; height: 14px; border-radius: 4px;
+  border: 1px solid #E2E8F0;
+}
+
+/* Layout templates */
+.ae-layouts {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+.ae-layout-btn {
+  padding: 10px 6px; border-radius: 10px; border: 1.5px solid #E2E8F0;
+  background: #F8FAFC; cursor: pointer; text-align: center;
+  transition: all 0.2s; display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+}
+.ae-layout-btn:hover { border-color: #CBD5E1; background: #fff; }
+.ae-layout-btn.active { border-color: #3B82F6; background: #EFF6FF; }
+.ae-layout-thumb {
+  width: 36px; height: 24px; border-radius: 4px; border: 1px solid #E2E8F0;
+  background: #fff; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 1px; overflow: hidden;
+}
+.ae-layout-thumb .bar {
+  background: #CBD5E1; border-radius: 1px;
+}
+.ae-layout-name {
+  font-size: 9px; font-weight: 600; color: #64748B;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+
+/* ---- Pricing Box ---- */
+.ae-pricing {
+  margin-top: 6px; padding: 18px;
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  border-radius: 14px; color: #fff;
+  box-shadow: 0 8px 24px rgba(15,23,42,0.3);
+}
+.ae-pricing-amount {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 30px; font-weight: 800;
+}
+.ae-pricing-period {
+  font-size: 14px; font-weight: 400; opacity: 0.6;
+}
+.ae-pricing-monthly {
+  font-size: 12px; color: #94A3B8; margin-top: 2px;
+}
+.ae-pricing-monthly span { color: #F59E0B; font-weight: 600; }
+
+/* ---- CTA Buttons ---- */
+.ae-cta-group { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.ae-cta-primary {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px; border-radius: 12px; border: none; cursor: pointer;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 14px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 50%, #1D4ED8 100%);
+  box-shadow: 0 4px 14px rgba(37,99,235,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: all 0.25s; transform: translateY(0);
+}
+.ae-cta-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37,99,235,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.ae-cta-secondary {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px; border-radius: 12px; cursor: pointer;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 14px; font-weight: 700;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #fff; border: none;
+  box-shadow: 0 4px 14px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: all 0.25s; transform: translateY(0);
+}
+.ae-cta-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16,185,129,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+/* ---- Campaign Simulator ---- */
+.ae-simulator {
+  margin-top: 20px; background: #fff; border-radius: 16px;
+  border: 1px solid #E2E8F0; overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+}
+.ae-sim-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 20px; border-bottom: 1px solid #E2E8F0;
+  background: linear-gradient(135deg, #F8FAFC, #EFF6FF);
+}
+.ae-sim-icon {
+  width: 32px; height: 32px; border-radius: 9px;
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 15px;
+}
+.ae-sim-title {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 15px; font-weight: 700; color: #0F172A;
+}
+
+.ae-sim-controls {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+  padding: 16px 20px; border-bottom: 1px solid #F1F5F9;
+}
+.ae-sim-control label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: #94A3B8; display: block; margin-bottom: 5px;
+}
+.ae-sim-control select, .ae-sim-control input {
+  width: 100%; padding: 9px 12px; border: 1.5px solid #E2E8F0;
+  border-radius: 9px; font-size: 13px; font-family: 'Inter', sans-serif;
+  color: #0F172A; background: #F8FAFC; outline: none;
+  transition: border-color 0.2s; box-sizing: border-box;
+  -webkit-appearance: none; appearance: none;
+}
+.ae-sim-control select {
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 28px; cursor: pointer;
+}
+.ae-sim-control select:focus, .ae-sim-control input:focus {
+  border-color: #3B82F6;
+}
+
+.ae-sim-results {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+  padding: 0;
+}
+.ae-sim-card {
+  padding: 18px 16px; text-align: center;
+  border-right: 1px solid #F1F5F9;
+  transition: background 0.2s;
+}
+.ae-sim-card:last-child { border-right: none; }
+.ae-sim-card:hover { background: #F8FAFC; }
+.ae-sim-card-value {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 22px; font-weight: 800; line-height: 1;
+}
+.ae-sim-card-value.reach { color: #3B82F6; }
+.ae-sim-card-value.impressions { color: #10B981; }
+.ae-sim-card-value.cpm { color: #F59E0B; }
+.ae-sim-card-value.roi { color: #8B5CF6; }
+.ae-sim-card-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: #94A3B8; margin-top: 5px;
+}
+
+/* Counter animation */
+@keyframes ae-count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ae-sim-card-value.animate {
+  animation: ae-count-up 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+/* ---- Safe margins overlay ---- */
+.ae-safe-margins {
+  position: absolute; inset: 8%; z-index: 5;
+  border: 1px dashed rgba(255,255,255,0.25);
+  border-radius: 4px; pointer-events: none;
+  display: none;
+}
+.ae-safe-margins.visible { display: block; }
+.ae-safe-margins-label {
+  position: absolute; top: -14px; left: 4px;
+  font-size: 8px; color: rgba(255,255,255,0.4);
+  text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .ae-body { grid-template-columns: 1fr; }
+  .ae-editor-col { border-left: none; border-top: 1px solid #E2E8F0; }
+  .ae-specs { grid-template-columns: repeat(2, 1fr); }
+  .ae-sim-results { grid-template-columns: repeat(2, 1fr); }
+  .ae-sim-card { border-bottom: 1px solid #F1F5F9; }
+}
 </style>
 </head>
 <body>
@@ -5371,6 +5944,7 @@ body.app-mode #view-app { display: block; }
                 </div>
                 <div class="profile-actions">
                   <button class="btn-primary">Reservar Ahora</button>
+                  <button class="btn-gold" onclick="openAdEditor({title:'Billboard Piantini #204',supplier:'Outdoor Media RD',mediaType:'OOH Billboard',location:'Santo Domingo',screenSize:'14ft &times; 48ft',impressions:'2,800,000',format:'Outdoor Billboard',rating:'4.8',priceWeek:'RD$112,500',priceMonth:'RD$450,000'})">&#127912; Crear Anuncio</button>
                   <button class="btn-outline">♡ Guardar</button>
                 </div>
               </div>
@@ -5495,6 +6069,7 @@ body.app-mode #view-app { display: block; }
               </div>
 
               <button class="btn-primary" style="width:100%; padding:13px; margin-top:14px; font-size:13px">Reservar Espacio</button>
+              <button class="btn-gold" style="width:100%; margin-top:8px; padding:13px; font-size:13px" onclick="openAdEditor({title:'Billboard Piantini #204',supplier:'Outdoor Media RD',mediaType:'OOH Billboard',location:'Santo Domingo',screenSize:'14ft &times; 48ft',impressions:'2,800,000',format:'Outdoor Billboard',rating:'4.8',priceWeek:'RD$112,500',priceMonth:'RD$450,000'})">&#127912; Crear Anuncio</button>
               <button class="btn-outline" style="width:100%; margin-top:8px">Solicitar Info</button>
             </div>
 
@@ -6216,6 +6791,352 @@ body.app-mode #view-app { display: block; }
 </div>
 </div>
 
+<!-- ==========================================================================
+     AD EDITOR MODAL — Professional DOOH Creative Editor
+     ========================================================================== -->
+<div class="ae-overlay" id="aeOverlay">
+  <div class="ae-modal">
+    <!-- Header -->
+    <div class="ae-header">
+      <div class="ae-header-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span id="aeMediaType">Pantalla Digital</span>
+      </div>
+      <span class="ae-header-supplier" id="aeSupplier">Digital Media RD</span>
+      <span class="ae-header-title" id="aeTitle">Pantalla LED Agora Mall</span>
+      <button class="ae-header-close" onclick="closeAdEditor()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Body: Two columns -->
+    <div class="ae-body">
+      <!-- LEFT: Preview Column -->
+      <div class="ae-preview-col">
+        <div class="ae-preview-label">Vista Previa del Medio</div>
+
+        <!-- Billboard Environment -->
+        <div class="ae-environment" id="aeEnvironment">
+          <!-- City background -->
+          <div class="ae-env-city"></div>
+          <div class="ae-env-buildings">
+            <div class="ae-env-building" style="width:28px;height:55%"></div>
+            <div class="ae-env-building" style="width:22px;height:40%"></div>
+            <div class="ae-env-building" style="width:35px;height:70%"></div>
+            <div class="ae-env-building" style="width:18px;height:45%"></div>
+            <div class="ae-env-building" style="width:40px;height:80%"></div>
+            <div class="ae-env-building" style="width:24px;height:50%"></div>
+            <div class="ae-env-building" style="width:30px;height:65%"></div>
+            <div class="ae-env-building" style="width:20px;height:35%"></div>
+            <div class="ae-env-building" style="width:38px;height:75%"></div>
+            <div class="ae-env-building" style="width:26px;height:48%"></div>
+            <div class="ae-env-building" style="width:32px;height:60%"></div>
+            <div class="ae-env-building" style="width:16px;height:30%"></div>
+          </div>
+
+          <!-- Billboard frame -->
+          <div class="ae-billboard-frame">
+            <div class="ae-billboard-screen" id="aeBillboardScreen">
+              <div class="ae-safe-margins" id="aeSafeMargins">
+                <span class="ae-safe-margins-label">Safe Area</span>
+              </div>
+              <div class="ae-creative-content" id="aeCreativeContent" style="background-color: #3B82F6;">
+                <div class="ae-creative-inner" id="aeCreativeInner">
+                  <div class="ae-creative-title" id="aeCreativeTitle" style="color: #fff;">grupoaro</div>
+                  <div class="ae-creative-subtitle" id="aeCreativeSubtitle" style="color: #fff;">promocion</div>
+                  <div class="ae-creative-cta-btn" id="aeCreativeCTA" style="color: #fff;">Compra Ahora</div>
+                </div>
+              </div>
+            </div>
+            <div class="ae-billboard-pole"></div>
+          </div>
+        </div>
+
+        <!-- Fit Mode Controls -->
+        <div class="ae-fit-controls">
+          <span class="ae-fit-label">Fit Mode</span>
+          <div class="ae-fit-toggle" id="aeFitToggle">
+            <button class="ae-fit-btn active" data-mode="fit">Fit</button>
+            <button class="ae-fit-btn" data-mode="fill">Fill</button>
+            <button class="ae-fit-btn" data-mode="smart-crop">Smart Crop</button>
+          </div>
+          <label style="display:flex; align-items:center; gap:5px; margin-left:auto; font-size:11px; color:#64748B; cursor:pointer;">
+            <input type="checkbox" id="aeSafeMarginsToggle" style="accent-color:#3B82F6;"> Safe Margins
+          </label>
+        </div>
+
+        <!-- Upload Zone -->
+        <div class="ae-upload-zone" id="aeUploadZone">
+          <div class="ae-upload-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="ae-upload-title">Upload Creative</div>
+          <div class="ae-upload-sub">Drag & drop or <span>browse files</span></div>
+          <div class="ae-upload-formats">
+            <span class="ae-upload-fmt">PNG</span>
+            <span class="ae-upload-fmt">JPG</span>
+            <span class="ae-upload-fmt">WEBP</span>
+            <span class="ae-upload-fmt">MP4</span>
+          </div>
+          <input type="file" class="ae-upload-file" id="aeUploadFile" accept="image/png,image/jpeg,image/webp,video/mp4">
+        </div>
+
+        <!-- Upload info bar -->
+        <div class="ae-upload-info" id="aeUploadInfo">
+          <span class="ae-upload-info-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </span>
+          <div class="ae-upload-info-text">
+            <span class="ae-upload-info-name" id="aeFileName">image.png</span>
+            <span class="ae-upload-info-size" id="aeFileSize">&middot; 1.2 MB &middot; 1920x1080</span>
+          </div>
+          <button class="ae-upload-remove" onclick="removeUploadedCreative()" title="Remove">&times;</button>
+        </div>
+
+        <!-- Media Specifications -->
+        <div class="ae-specs" id="aeSpecs">
+          <div class="ae-spec-card">
+            <div class="ae-spec-icon loc">&#128205;</div>
+            <div class="ae-spec-label">Location</div>
+            <div class="ae-spec-value" id="aeSpecLoc">Santo Domingo</div>
+          </div>
+          <div class="ae-spec-card">
+            <div class="ae-spec-icon size">&#128207;</div>
+            <div class="ae-spec-label">Screen Size</div>
+            <div class="ae-spec-value" id="aeSpecSize">6m &times; 4m</div>
+          </div>
+          <div class="ae-spec-card">
+            <div class="ae-spec-icon imp">&#128200;</div>
+            <div class="ae-spec-label">Monthly Impressions</div>
+            <div class="ae-spec-value" id="aeSpecImp">420,000</div>
+          </div>
+          <div class="ae-spec-card">
+            <div class="ae-spec-icon fmt">&#128250;</div>
+            <div class="ae-spec-label">Format</div>
+            <div class="ae-spec-value" id="aeSpecFmt">LED Digital Screen</div>
+          </div>
+          <div class="ae-spec-card">
+            <div class="ae-spec-icon rating">&#11088;</div>
+            <div class="ae-spec-label">Rating</div>
+            <div class="ae-spec-value" id="aeSpecRating">4.9</div>
+          </div>
+          <div class="ae-spec-card">
+            <div class="ae-spec-icon ar">&#127912;</div>
+            <div class="ae-spec-label">Aspect Ratio</div>
+            <div class="ae-spec-value" id="aeSpecAR">3:2</div>
+          </div>
+        </div>
+
+        <!-- Dimension Diagram -->
+        <div class="ae-dim-diagram">
+          <div class="ae-dim-visual" id="aeDimVisual">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5" opacity="0.5"><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+            <span class="ae-dim-w" id="aeDimW">6m</span>
+            <span class="ae-dim-h" id="aeDimH">4m</span>
+          </div>
+          <div class="ae-dim-info">
+            <div class="ae-dim-info-row"><span>Width</span><span id="aeDimWidth">6m</span></div>
+            <div class="ae-dim-info-row"><span>Height</span><span id="aeDimHeight">4m</span></div>
+            <div class="ae-dim-info-row"><span>Aspect Ratio</span><span id="aeDimAR">3:2</span></div>
+            <div class="ae-dim-info-row"><span>Resolution</span><span id="aeDimRes">1920 &times; 1280</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Editor Controls Column -->
+      <div class="ae-editor-col">
+        <!-- Text Editor -->
+        <div class="ae-editor-section">
+          <div class="ae-editor-section-title">Editor de Anuncio</div>
+          <div class="ae-field">
+            <label class="ae-field-label">Titular</label>
+            <input type="text" class="ae-field-input" id="aeInputTitle" value="grupoaro" placeholder="Brand / headline">
+          </div>
+          <div class="ae-field">
+            <label class="ae-field-label">Descripcion</label>
+            <textarea class="ae-field-input" id="aeInputDesc" placeholder="Short description or tagline">promocion</textarea>
+          </div>
+          <div class="ae-field">
+            <label class="ae-field-label">Call to Action</label>
+            <input type="text" class="ae-field-input" id="aeInputCTA" value="Compra Ahora" placeholder="e.g. Shop Now, Learn More">
+          </div>
+        </div>
+
+        <!-- Typography Controls -->
+        <div class="ae-editor-section">
+          <div class="ae-editor-section-title">Typography</div>
+          <div class="ae-typo-row">
+            <select class="ae-typo-select" id="aeFontFamily">
+              <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
+              <option value="'Inter', sans-serif" selected>Inter</option>
+              <option value="'Satoshi', sans-serif">Satoshi</option>
+              <option value="'Hanken Grotesk', sans-serif">Hanken Grotesk</option>
+              <option value="'Arial', sans-serif">Arial</option>
+            </select>
+            <select class="ae-typo-select" id="aeFontWeight">
+              <option value="400">Regular</option>
+              <option value="500">Medium</option>
+              <option value="600">Semibold</option>
+              <option value="700" selected>Bold</option>
+              <option value="800">Extra Bold</option>
+              <option value="900">Black</option>
+            </select>
+          </div>
+          <div class="ae-typo-mini">
+            <div class="ae-typo-mini-field">
+              <span class="ae-typo-mini-label">Size</span>
+              <input type="text" class="ae-typo-mini-input" id="aeFontSize" value="22px">
+            </div>
+            <div class="ae-typo-mini-field">
+              <span class="ae-typo-mini-label">Spacing</span>
+              <input type="text" class="ae-typo-mini-input" id="aeLetterSpacing" value="0px">
+            </div>
+            <div class="ae-typo-mini-field">
+              <span class="ae-typo-mini-label">Line H.</span>
+              <input type="text" class="ae-typo-mini-input" id="aeLineHeight" value="1.1">
+            </div>
+          </div>
+        </div>
+
+        <!-- Colors -->
+        <div class="ae-editor-section">
+          <div class="ae-editor-section-title">Color de Fondo</div>
+          <div class="ae-colors" id="aeBgColors">
+            <div class="ae-color-swatch active" style="background:#3B82F6" data-color="#3B82F6"></div>
+            <div class="ae-color-swatch" style="background:#EF4444" data-color="#EF4444"></div>
+            <div class="ae-color-swatch" style="background:#10B981" data-color="#10B981"></div>
+            <div class="ae-color-swatch" style="background:#F59E0B" data-color="#F59E0B"></div>
+            <div class="ae-color-swatch" style="background:#A855F7" data-color="#A855F7"></div>
+            <div class="ae-color-swatch" style="background:#0F172A" data-color="#0F172A"></div>
+            <div class="ae-color-swatch" style="background:linear-gradient(135deg,#667EEA,#764BA2)" data-color="linear-gradient(135deg,#667EEA,#764BA2)"></div>
+            <div class="ae-color-swatch" style="background:linear-gradient(135deg,#F093FB,#F5576C)" data-color="linear-gradient(135deg,#F093FB,#F5576C)"></div>
+          </div>
+          <div class="ae-editor-section-title" style="margin-top:14px">Color de Texto</div>
+          <div class="ae-text-colors" id="aeTextColors">
+            <button class="ae-text-color-btn active" data-color="#FFFFFF">
+              <span class="dot" style="background:#fff"></span> Blanco
+            </button>
+            <button class="ae-text-color-btn" data-color="#0F172A">
+              <span class="dot" style="background:#0F172A; border-color:transparent"></span> Negro
+            </button>
+            <button class="ae-text-color-btn" data-color="#FDE68A">
+              <span class="dot" style="background:#FDE68A; border-color:transparent"></span> Gold
+            </button>
+          </div>
+        </div>
+
+        <!-- Layout Templates -->
+        <div class="ae-editor-section">
+          <div class="ae-editor-section-title">Layout Template</div>
+          <div class="ae-layouts" id="aeLayouts">
+            <button class="ae-layout-btn active" data-layout="centered">
+              <div class="ae-layout-thumb">
+                <div class="bar" style="width:20px;height:3px"></div>
+                <div class="bar" style="width:14px;height:2px"></div>
+                <div class="bar" style="width:16px;height:4px;border-radius:2px;margin-top:1px"></div>
+              </div>
+              <span class="ae-layout-name">Centered</span>
+            </button>
+            <button class="ae-layout-btn" data-layout="top-banner">
+              <div class="ae-layout-thumb" style="justify-content:flex-start; padding-top:3px">
+                <div class="bar" style="width:20px;height:3px"></div>
+                <div class="bar" style="width:14px;height:2px"></div>
+              </div>
+              <span class="ae-layout-name">Top</span>
+            </button>
+            <button class="ae-layout-btn" data-layout="bottom-cta">
+              <div class="ae-layout-thumb" style="justify-content:flex-end; padding-bottom:3px">
+                <div class="bar" style="width:20px;height:3px"></div>
+                <div class="bar" style="width:16px;height:4px;border-radius:2px"></div>
+              </div>
+              <span class="ae-layout-name">Bottom</span>
+            </button>
+            <button class="ae-layout-btn" data-layout="minimal">
+              <div class="ae-layout-thumb">
+                <div class="bar" style="width:20px;height:4px"></div>
+              </div>
+              <span class="ae-layout-name">Minimal</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="ae-editor-section">
+          <div class="ae-pricing" id="aePricing">
+            <div>
+              <span class="ae-pricing-amount" id="aePriceWeek">RD$80,000</span>
+              <span class="ae-pricing-period"> / semana</span>
+            </div>
+            <div class="ae-pricing-monthly">Estimated Monthly Value <span id="aePriceMonth">RD$250,000</span></div>
+          </div>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="ae-cta-group">
+          <button class="ae-cta-primary" onclick="simulateCampaign()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Simular Campana
+          </button>
+          <button class="ae-cta-secondary" onclick="publishCampaign()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4z"/></svg>
+            Publicar Campana
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campaign Simulator (full width below) -->
+    <div class="ae-simulator" id="aeSimulator" style="display:none;">
+      <div class="ae-sim-header">
+        <div class="ae-sim-icon">&#128202;</div>
+        <div class="ae-sim-title">Simulador de Campana</div>
+      </div>
+      <div class="ae-sim-controls">
+        <div class="ae-sim-control">
+          <label>Duracion</label>
+          <select id="aeSimDuration" onchange="updateSimulator()">
+            <option value="1">1 Semana</option>
+            <option value="2" selected>2 Semanas</option>
+            <option value="4">1 Mes</option>
+            <option value="8">2 Meses</option>
+          </select>
+        </div>
+        <div class="ae-sim-control">
+          <label>Presupuesto (DOP)</label>
+          <input type="number" id="aeSimBudget" value="250000" onchange="updateSimulator()">
+        </div>
+        <div class="ae-sim-control">
+          <label>Cantidad de Medios</label>
+          <select id="aeSimMedia" onchange="updateSimulator()">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      </div>
+      <div class="ae-sim-results" id="aeSimResults">
+        <div class="ae-sim-card">
+          <div class="ae-sim-card-value reach" id="aeSimReach">74K</div>
+          <div class="ae-sim-card-label">Alcance Estimado</div>
+        </div>
+        <div class="ae-sim-card">
+          <div class="ae-sim-card-value impressions" id="aeSimImpressions">210K</div>
+          <div class="ae-sim-card-label">Impresiones Totales</div>
+        </div>
+        <div class="ae-sim-card">
+          <div class="ae-sim-card-value cpm" id="aeSimCPM">RD$1190</div>
+          <div class="ae-sim-card-label">CPM</div>
+        </div>
+        <div class="ae-sim-card">
+          <div class="ae-sim-card-value roi" id="aeSimROI">346%</div>
+          <div class="ae-sim-card-label">ROI Estimado</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============ VIEW SWITCHING ============
 function enterApp() {
@@ -6342,6 +7263,358 @@ document.querySelectorAll('.ai-tag').forEach(tag => {
     this.classList.toggle('selected');
   });
 });
+
+// ==========================================================================
+// AD EDITOR — Professional DOOH Creative Editor
+// ==========================================================================
+var aeState = {
+  bgColor: '#3B82F6',
+  textColor: '#FFFFFF',
+  layout: 'centered',
+  fitMode: 'fit',
+  uploadedFile: null,
+  uploadedURL: null,
+};
+
+function openAdEditor(config) {
+  config = config || {};
+  var overlay = document.getElementById('aeOverlay');
+  if (config.title) document.getElementById('aeTitle').textContent = config.title;
+  if (config.supplier) document.getElementById('aeSupplier').textContent = config.supplier;
+  if (config.mediaType) document.getElementById('aeMediaType').textContent = config.mediaType;
+  if (config.location) document.getElementById('aeSpecLoc').textContent = config.location;
+  if (config.screenSize) document.getElementById('aeSpecSize').innerHTML = config.screenSize;
+  if (config.impressions) document.getElementById('aeSpecImp').textContent = config.impressions;
+  if (config.format) document.getElementById('aeSpecFmt').textContent = config.format;
+  if (config.rating) document.getElementById('aeSpecRating').textContent = config.rating;
+  if (config.priceWeek) document.getElementById('aePriceWeek').textContent = config.priceWeek;
+  if (config.priceMonth) document.getElementById('aePriceMonth').textContent = config.priceMonth;
+  overlay.classList.add('opening');
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      overlay.classList.add('open');
+      overlay.classList.remove('opening');
+    });
+  });
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAdEditor() {
+  var overlay = document.getElementById('aeOverlay');
+  overlay.classList.remove('open');
+  setTimeout(function() { overlay.classList.remove('opening'); }, 350);
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click
+document.getElementById('aeOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAdEditor();
+});
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeAdEditor();
+});
+
+// --- Live text editing ---
+document.getElementById('aeInputTitle').addEventListener('input', function() {
+  document.getElementById('aeCreativeTitle').textContent = this.value || 'Headline';
+});
+document.getElementById('aeInputDesc').addEventListener('input', function() {
+  document.getElementById('aeCreativeSubtitle').textContent = this.value || 'Subtitle';
+});
+document.getElementById('aeInputCTA').addEventListener('input', function() {
+  document.getElementById('aeCreativeCTA').textContent = this.value || 'CTA';
+});
+
+// --- Typography controls ---
+function applyTypography() {
+  var family = document.getElementById('aeFontFamily').value;
+  var weight = document.getElementById('aeFontWeight').value;
+  var size = document.getElementById('aeFontSize').value;
+  var spacing = document.getElementById('aeLetterSpacing').value;
+  var lh = document.getElementById('aeLineHeight').value;
+  var title = document.getElementById('aeCreativeTitle');
+  title.style.fontFamily = family;
+  title.style.fontWeight = weight;
+  title.style.fontSize = size;
+  title.style.letterSpacing = spacing;
+  title.style.lineHeight = lh;
+}
+['aeFontFamily','aeFontWeight','aeFontSize','aeLetterSpacing','aeLineHeight'].forEach(function(id) {
+  document.getElementById(id).addEventListener('input', applyTypography);
+  document.getElementById(id).addEventListener('change', applyTypography);
+});
+
+// --- Background colors ---
+document.getElementById('aeBgColors').addEventListener('click', function(e) {
+  var swatch = e.target.closest('.ae-color-swatch');
+  if (!swatch) return;
+  this.querySelectorAll('.ae-color-swatch').forEach(function(s) { s.classList.remove('active'); });
+  swatch.classList.add('active');
+  var color = swatch.getAttribute('data-color');
+  aeState.bgColor = color;
+  var content = document.getElementById('aeCreativeContent');
+  if (color.indexOf('gradient') > -1) {
+    content.style.backgroundColor = '';
+    content.style.background = color;
+  } else {
+    content.style.background = '';
+    content.style.backgroundColor = color;
+  }
+});
+
+// --- Text colors ---
+document.getElementById('aeTextColors').addEventListener('click', function(e) {
+  var btn = e.target.closest('.ae-text-color-btn');
+  if (!btn) return;
+  this.querySelectorAll('.ae-text-color-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var color = btn.getAttribute('data-color');
+  aeState.textColor = color;
+  document.getElementById('aeCreativeTitle').style.color = color;
+  document.getElementById('aeCreativeSubtitle').style.color = color;
+  document.getElementById('aeCreativeCTA').style.color = color;
+});
+
+// --- Layout templates ---
+document.getElementById('aeLayouts').addEventListener('click', function(e) {
+  var btn = e.target.closest('.ae-layout-btn');
+  if (!btn) return;
+  this.querySelectorAll('.ae-layout-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var layout = btn.getAttribute('data-layout');
+  aeState.layout = layout;
+  var inner = document.getElementById('aeCreativeInner');
+  var content = document.getElementById('aeCreativeContent');
+  // Reset
+  content.style.justifyContent = 'center';
+  content.style.alignItems = 'center';
+  inner.style.textAlign = 'center';
+  inner.style.alignItems = 'center';
+  document.getElementById('aeCreativeSubtitle').style.display = '';
+  document.getElementById('aeCreativeCTA').style.display = '';
+  if (layout === 'centered') {
+    // defaults
+  } else if (layout === 'top-banner') {
+    content.style.justifyContent = 'flex-start';
+    content.style.paddingTop = '25px';
+  } else if (layout === 'bottom-cta') {
+    content.style.justifyContent = 'flex-end';
+    content.style.paddingBottom = '25px';
+  } else if (layout === 'minimal') {
+    document.getElementById('aeCreativeSubtitle').style.display = 'none';
+    document.getElementById('aeCreativeCTA').style.display = 'none';
+  }
+});
+
+// --- Fit mode ---
+document.getElementById('aeFitToggle').addEventListener('click', function(e) {
+  var btn = e.target.closest('.ae-fit-btn');
+  if (!btn) return;
+  this.querySelectorAll('.ae-fit-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  aeState.fitMode = btn.getAttribute('data-mode');
+  applyFitMode();
+});
+
+function applyFitMode() {
+  var img = document.querySelector('.ae-creative-uploaded-img');
+  if (!img) return;
+  var bgOverlay = document.querySelector('.ae-creative-bg-overlay');
+  if (aeState.fitMode === 'fit') {
+    img.style.objectFit = 'contain';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    if (bgOverlay) bgOverlay.style.display = 'block';
+  } else if (aeState.fitMode === 'fill') {
+    img.style.objectFit = 'cover';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    if (bgOverlay) bgOverlay.style.display = 'none';
+  } else if (aeState.fitMode === 'smart-crop') {
+    img.style.objectFit = 'cover';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    if (bgOverlay) bgOverlay.style.display = 'none';
+  }
+}
+
+// --- Safe margins toggle ---
+document.getElementById('aeSafeMarginsToggle').addEventListener('change', function() {
+  document.getElementById('aeSafeMargins').classList.toggle('visible', this.checked);
+});
+
+// --- File Upload ---
+var uploadZone = document.getElementById('aeUploadZone');
+var uploadFile = document.getElementById('aeUploadFile');
+
+uploadZone.addEventListener('click', function() { uploadFile.click(); });
+uploadZone.addEventListener('dragover', function(e) {
+  e.preventDefault(); this.classList.add('dragover');
+});
+uploadZone.addEventListener('dragleave', function() { this.classList.remove('dragover'); });
+uploadZone.addEventListener('drop', function(e) {
+  e.preventDefault(); this.classList.remove('dragover');
+  if (e.dataTransfer.files.length) handleUpload(e.dataTransfer.files[0]);
+});
+uploadFile.addEventListener('change', function() {
+  if (this.files.length) handleUpload(this.files[0]);
+});
+
+function handleUpload(file) {
+  var allowed = ['image/png','image/jpeg','image/webp','video/mp4'];
+  if (allowed.indexOf(file.type) === -1) {
+    alert('Formato no soportado. Use PNG, JPG, WEBP o MP4.');
+    return;
+  }
+  aeState.uploadedFile = file;
+  // Show info bar
+  document.getElementById('aeFileName').textContent = file.name;
+  var sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+
+  if (file.type.indexOf('video') > -1) {
+    showUploadedVideo(file, sizeMB);
+  } else {
+    showUploadedImage(file, sizeMB);
+  }
+}
+
+function showUploadedImage(file, sizeMB) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var w = img.naturalWidth;
+      var h = img.naturalHeight;
+      // Auto-resize if too large
+      var maxDim = 1920;
+      if (w > maxDim || h > maxDim) {
+        var scale = Math.min(maxDim / w, maxDim / h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
+      document.getElementById('aeFileSize').textContent = ' \u00b7 ' + sizeMB + ' MB \u00b7 ' + w + 'x' + h;
+      document.getElementById('aeUploadInfo').classList.add('visible');
+
+      // Replace creative content with uploaded image
+      var content = document.getElementById('aeCreativeContent');
+      var inner = document.getElementById('aeCreativeInner');
+      inner.style.display = 'none';
+      // Remove old uploaded elements
+      var oldImg = content.querySelector('.ae-creative-uploaded-img');
+      if (oldImg) oldImg.remove();
+      var oldBg = content.querySelector('.ae-creative-bg-overlay');
+      if (oldBg) oldBg.remove();
+
+      // Create blur background fill
+      var bgDiv = document.createElement('div');
+      bgDiv.className = 'ae-creative-bg-overlay';
+      bgDiv.style.backgroundImage = 'url(' + e.target.result + ')';
+      content.appendChild(bgDiv);
+
+      // Create main image
+      var imgEl = document.createElement('img');
+      imgEl.className = 'ae-creative-uploaded-img';
+      imgEl.src = e.target.result;
+      imgEl.style.position = 'relative';
+      imgEl.style.zIndex = '1';
+      imgEl.style.maxWidth = '100%';
+      imgEl.style.maxHeight = '100%';
+      imgEl.style.objectFit = 'contain';
+      content.appendChild(imgEl);
+      aeState.uploadedURL = e.target.result;
+      applyFitMode();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function showUploadedVideo(file, sizeMB) {
+  var url = URL.createObjectURL(file);
+  document.getElementById('aeFileSize').textContent = ' \u00b7 ' + sizeMB + ' MB \u00b7 Video';
+  document.getElementById('aeUploadInfo').classList.add('visible');
+
+  var content = document.getElementById('aeCreativeContent');
+  var inner = document.getElementById('aeCreativeInner');
+  inner.style.display = 'none';
+  var oldImg = content.querySelector('.ae-creative-uploaded-img');
+  if (oldImg) oldImg.remove();
+  var oldBg = content.querySelector('.ae-creative-bg-overlay');
+  if (oldBg) oldBg.remove();
+  var oldVid = content.querySelector('video');
+  if (oldVid) oldVid.remove();
+
+  var video = document.createElement('video');
+  video.src = url;
+  video.autoplay = true;
+  video.loop = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.style.cssText = 'position:relative;z-index:1;max-width:100%;max-height:100%;object-fit:contain;';
+  video.className = 'ae-creative-uploaded-img';
+  content.appendChild(video);
+  aeState.uploadedURL = url;
+}
+
+function removeUploadedCreative() {
+  aeState.uploadedFile = null;
+  aeState.uploadedURL = null;
+  document.getElementById('aeUploadInfo').classList.remove('visible');
+  var content = document.getElementById('aeCreativeContent');
+  var img = content.querySelector('.ae-creative-uploaded-img');
+  if (img) img.remove();
+  var bg = content.querySelector('.ae-creative-bg-overlay');
+  if (bg) bg.remove();
+  var vid = content.querySelector('video');
+  if (vid) vid.remove();
+  document.getElementById('aeCreativeInner').style.display = '';
+  uploadFile.value = '';
+}
+
+// --- Campaign Simulator ---
+function simulateCampaign() {
+  var sim = document.getElementById('aeSimulator');
+  sim.style.display = '';
+  sim.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  updateSimulator();
+}
+
+function updateSimulator() {
+  var weeks = parseInt(document.getElementById('aeSimDuration').value) || 2;
+  var budget = parseInt(document.getElementById('aeSimBudget').value) || 250000;
+  var media = parseInt(document.getElementById('aeSimMedia').value) || 1;
+
+  var impressionsPerWeek = 105000 * media;
+  var totalImpressions = impressionsPerWeek * weeks;
+  var reach = Math.round(totalImpressions * 0.35);
+  var cpm = Math.round(budget / (totalImpressions / 1000));
+  var roi = Math.round((totalImpressions * 0.005 * 150 / budget) * 100);
+
+  animateCounter('aeSimReach', formatK(reach));
+  animateCounter('aeSimImpressions', formatK(totalImpressions));
+  animateCounter('aeSimCPM', 'RD$' + cpm.toLocaleString());
+  animateCounter('aeSimROI', roi + '%');
+}
+
+function formatK(num) {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (num >= 1000) return Math.round(num / 1000) + 'K';
+  return num.toString();
+}
+
+function animateCounter(id, finalValue) {
+  var el = document.getElementById(id);
+  el.classList.remove('animate');
+  void el.offsetWidth; // force reflow
+  el.textContent = finalValue;
+  el.classList.add('animate');
+}
+
+function publishCampaign() {
+  alert('Campana enviada para revision. Recibira confirmacion por email.');
+}
 </script>
 </body>
 </html>
